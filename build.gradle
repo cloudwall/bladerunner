@@ -1,0 +1,103 @@
+// gradle task and plugin configuration
+buildscript {
+    repositories {
+        jcenter()
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath 'net.ltgt.gradle:gradle-apt-plugin:0.15'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'signing'
+apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'net.ltgt.apt-idea'
+
+// global settings
+group 'io.cloudwall'
+version '0.1.0'
+sourceCompatibility = JavaVersion.VERSION_1_9
+targetCompatibility = JavaVersion.VERSION_1_9
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+    maven { url 'http://download.oracle.com/maven' }
+    maven { url 'https://dl.bintray.com/io-cloudwall/cloudwall-maven' }
+}
+
+dependencies {
+    compile 'args4j:args4j:2.33',
+            'com.google.dagger:dagger:2.14.1',
+            'com.typesafe:config:1.3.3',
+            'org.apache.logging.log4j:log4j-api:2.10.0',
+            'org.apache.logging.log4j:log4j-core:2.10.0',
+            'org.fusesource.jansi:jansi:1.17'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.14.1'
+    testCompile 'junit:junit:4.12',
+                'org.hamcrest:hamcrest-library:1.4-atlassian-1',
+                'org.mockito:mockito-core:2.15.0'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from tasks.javadoc.destinationDir
+}
+
+// workaround to suppress extra-noisy Javadoc lint and other warnings
+allprojects {
+    tasks.withType(Javadoc) {
+      options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.6'
+}
+
+configurations.create('bintrayArchives')
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+    bintrayArchives jar
+    bintrayArchives javadocJar
+    bintrayArchives  sourcesJar
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+   	key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+	configurations = ['bintrayArchives']
+	pkg {
+		repo = 'cloudwall-maven'
+		name = 'bladerunner'
+		userOrg = 'io-cloudwall'
+        desc = 'Bladerunner App Config API'
+        websiteUrl = 'https://github.com/cloudwall/bladerunner'
+        issueTrackerUrl = 'https://github.com/cloudwall/bladerunner/issues'
+		vcsUrl = 'https://github.com/cloudwall/bladerunner.git'
+        licenses = ['Apache-2.0']
+
+        githubRepo = 'cloudwall/bladerunner'
+        githubReleaseNotesFile = 'README.md'
+
+		version {
+			name = project.version
+			vcsTag = "v$project.version"
+			attributes = ['gradle-plugin': "io.cloudwall:bladerunner:$project.version"]
+		}
+	}
+}
