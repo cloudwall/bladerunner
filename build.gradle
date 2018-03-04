@@ -33,6 +33,19 @@ repositories {
     maven { url 'https://dl.bintray.com/io-cloudwall/cloudwall-maven' }
 }
 
+sourceSets {
+    examples {
+        java {
+            srcDir 'src/examples/java'
+        }
+        resources {
+            srcDir 'src/examples/resources'
+        }
+        compileClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+idea.module.generatedSourceDirs += sourceSets.examples.output.generatedSourcesDir
+
 dependencies {
     compile 'args4j:args4j:2.33',
             'com.google.code.findbugs:jsr305:3.0.2',
@@ -42,6 +55,7 @@ dependencies {
             'org.apache.logging.log4j:log4j-core:2.10.0',
             'org.fusesource.jansi:jansi:1.17'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.14.1'
+    examplesAnnotationProcessor 'com.google.dagger:dagger-compiler:2.14.1'
     testCompile 'junit:junit:4.12',
                 'org.hamcrest:hamcrest-library:1.4-atlassian-1',
                 'org.mockito:mockito-core:2.15.0'
