@@ -1,6 +1,5 @@
 package cloudwall.appconfig;
 
-import cloudwall.appconfig.example.hello.HelloWorld;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -15,6 +14,7 @@ import java.util.List;
  * @author <a href="mailto:kyle.downey@gmail.com">Kyle F. Downey</a>
  */
 public class BladeRunner {
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
         Config config = ConfigFactory.load(args[0]);
         Config bladerunnerConfig = config.getConfig("bladerunner");
@@ -22,6 +22,7 @@ public class BladeRunner {
         for (Config bladeConfig : bladeConfigs) {
             String clazzName = bladeConfig.getString("component");
             String configRef = bladeConfig.getString("config");
+            Config componentConfig = config.getConfig(configRef);
 
             clazzName = clazzName.replace('$', '_');
             int lastNdxDot = clazzName.lastIndexOf('.');
@@ -32,8 +33,19 @@ public class BladeRunner {
             }
 
             Class componentClazz = Class.forName(clazzName);
-            Method createMethod = componentClazz.getMethod("create");
-            Object component = createMethod.invoke(null, new Object[0]);
+            Class builderClazz = Class.forName(clazzName + "$Builder");
+
+            Object component;
+            Method configModuleProvider;
+            try {
+                configModuleProvider = builderClazz.getMethod("configModule", ConfigModule.class);
+                Object builder = componentClazz.getMethod("builder").invoke(null);
+                builder = configModuleProvider.invoke(builder, new ConfigModule(componentConfig));
+                component = builderClazz.getMethod("build").invoke(builder);
+            } catch (NoSuchMethodException e) {
+                Method createMethod = componentClazz.getMethod("create");
+                component = createMethod.invoke(null);
+            }
 
             Method[] methods = component.getClass().getMethods();
             Method bladeMethod = null;
@@ -46,11 +58,11 @@ public class BladeRunner {
             }
 
             if (bladeMethod == null) {
-                throw new IllegalArgumentException("component class has more than one public method");
+                throw new IllegalArgumentException("component class missing public factory method");
             }
 
             Blade blade = (Blade)bladeMethod.invoke(component);
-            blade.configure(config.getConfig(configRef));
+            blade.configure(componentConfig);
             blade.run();
             blade.preShutdown();
             blade.postShutdown();

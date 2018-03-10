@@ -54,8 +54,8 @@ dependencies {
             'org.apache.logging.log4j:log4j-api:2.10.0',
             'org.apache.logging.log4j:log4j-core:2.10.0',
             'org.fusesource.jansi:jansi:1.17'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.14.1'
-    examplesAnnotationProcessor 'com.google.dagger:dagger-compiler:2.14.1'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.15'
+    examplesAnnotationProcessor 'com.google.dagger:dagger-compiler:2.15'
     testCompile 'junit:junit:4.12',
                 'org.hamcrest:hamcrest-library:1.4-atlassian-1',
                 'org.mockito:mockito-core:2.15.0'

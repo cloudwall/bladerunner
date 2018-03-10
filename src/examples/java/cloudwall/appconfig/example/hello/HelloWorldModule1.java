@@ -4,14 +4,14 @@ import dagger.Module;
 import dagger.Provides;
 
 /**
- * TODO: add comment
+ * A plain vanilla module.
  *
  * @author <a href="mailto:kyle.downey@gmail.com">Kyle F. Downey</a>
  */
 @Module
-public class HelloWorldModule {
+public class HelloWorldModule1 {
     @Provides
     GreetingRenderer greetingRenderer() {
-        return new AnsiGreetingRenderer();
+        return new PlaintextGreetingRenderer();
     }
 }

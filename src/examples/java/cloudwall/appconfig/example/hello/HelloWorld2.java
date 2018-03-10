@@ -1,22 +1,23 @@
 package cloudwall.appconfig.example.hello;
 
 import cloudwall.appconfig.Blade;
+import cloudwall.appconfig.ConfigModule;
 import com.typesafe.config.Config;
 import dagger.Component;
 
 import javax.inject.Inject;
 
 /**
- * Bare-bones example of Bladerunner, taking all defaults.
+ * Example of injecting a ConfigModule to allow configuration of provided services.
  *
  * @author <a href="mailto:kyle.downey@gmail.com">Kyle F. Downey</a>
  */
-public class HelloWorld implements Blade {
+public class HelloWorld2 implements Blade {
     private final GreetingRenderer renderer;
     private String greeting;
 
     @Inject
-    public HelloWorld(GreetingRenderer renderer) {
+    public HelloWorld2(GreetingRenderer renderer) {
         this.renderer = renderer;
     }
 
@@ -30,8 +31,8 @@ public class HelloWorld implements Blade {
         renderer.renderGreeting(greeting);
     }
 
-    @Component(modules=HelloWorldModule.class)
+    @Component(modules={HelloWorldModule2.class, ConfigModule.class})
     public interface HelloWorldComponent {
-        HelloWorld helloWorld();
+        HelloWorld2 helloWorld();
     }
 }
