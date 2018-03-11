@@ -9,6 +9,5 @@ import com.typesafe.config.Config;
  */
 public interface Blade extends Runnable {
     default void configure(Config config) { }
-    default void preShutdown() { }
-    default void postShutdown() { }
+    default void shutdown() { }
 }

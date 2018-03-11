@@ -6,5 +6,5 @@ package cloudwall.appconfig;
  * @author <a href="mailto:kyle.downey@gmail.com">Kyle F. Downey</a>
  */
 public interface LoggingInitializer {
-    void initLogging();
+    void initLogging(String logConfigPath);
 }

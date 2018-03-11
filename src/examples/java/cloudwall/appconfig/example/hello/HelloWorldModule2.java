@@ -3,6 +3,7 @@ package cloudwall.appconfig.example.hello;
 import com.typesafe.config.Config;
 import dagger.Module;
 import dagger.Provides;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An example of a configurable module.
