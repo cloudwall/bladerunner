@@ -8,22 +8,25 @@ buildscript {
     }
     dependencies {
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
         classpath 'net.ltgt.gradle:gradle-apt-plugin:0.15'
     }
 }
 
+apply plugin: 'application'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'net.ltgt.apt-idea'
 
 // global settings
 group 'io.cloudwall'
-version '0.1.0'
+version '0.1.1'
 sourceCompatibility = JavaVersion.VERSION_1_9
 targetCompatibility = JavaVersion.VERSION_1_9
 repositories {
@@ -78,8 +81,21 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
 }
 
+task examplesJar(type: Jar, dependsOn: ['examplesClasses' ]) {
+    from sourceSets.examples.output
+    classifier = 'examples'
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '4.6'
+}
+
+shadowDistZip {
+    classifier = 'all'
+}
+
+shadowDistTar {
+    classifier = 'all'
 }
 
 configurations.create('bintrayArchives')
@@ -87,9 +103,11 @@ artifacts {
     archives jar
     archives javadocJar
     archives sourcesJar
+    archives examplesJar
     bintrayArchives jar
     bintrayArchives javadocJar
-    bintrayArchives  sourcesJar
+    bintrayArchives sourcesJar
+    bintrayArchives examplesJar
 }
 
 bintray {
@@ -116,3 +134,5 @@ bintray {
 		}
 	}
 }
+
+mainClassName = 'cloudwall.appconfig.BladeRunner'
