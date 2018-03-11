@@ -31,9 +31,10 @@ public class BladeRunner {
             System.err.println("Usage: " + BladeRunner.class.getName() + " fileOrResource.conf");
         }
 
-        Config config = ConfigFactory.load(args[0]);
+        Config config = ConfigFactory.load(ClassLoader.getSystemClassLoader(), args[0]);
         if (!config.hasPath("bladerunner")) {
             System.err.println(args[0] + " does not exist or is invalid (missing bladerunner block)");
+            System.exit(-1);
         }
 
         Config bladerunnerConfig = config.getConfig("bladerunner");
@@ -55,9 +56,11 @@ public class BladeRunner {
                 bladeFutures.add(CompletableFuture.runAsync(blade));
             } catch (ClassNotFoundException e) {
                 System.err.println("Blade class does not exist: " + clazzName);
+                System.exit(-1);
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 System.err.println("Reflection error loading Blade class: " + clazzName);
                 System.err.println(e);
+                System.exit(-1);
             }
         }
 
