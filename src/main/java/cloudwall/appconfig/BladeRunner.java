@@ -29,9 +29,10 @@ public class BladeRunner {
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Usage: " + BladeRunner.class.getName() + " fileOrResource.conf");
+            System.exit(-1);
         }
 
-        Config config = ConfigFactory.load(ClassLoader.getSystemClassLoader(), args[0]);
+        Config config = ConfigFactory.load(BladeRunner.class.getClassLoader(), args[0]);
         if (!config.hasPath("bladerunner")) {
             System.err.println(args[0] + " does not exist or is invalid (missing bladerunner block)");
             System.exit(-1);
