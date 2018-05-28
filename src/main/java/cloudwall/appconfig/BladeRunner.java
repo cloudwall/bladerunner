@@ -60,7 +60,7 @@ public class BladeRunner {
                 System.exit(-1);
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 System.err.println("Reflection error loading Blade class: " + clazzName);
-                System.err.println(e);
+                e.printStackTrace();
                 System.exit(-1);
             }
         }
